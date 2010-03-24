@@ -14,12 +14,15 @@ function wtf( $smth ) {
     echo "<pre>"; var_dump( $smth ); echo "</pre>";
 }
 
-$API_KEY = 'dj0yJmk9RW1TaFkzN1NNcVFMJmQ9WVdrOVJXRlZjbnBpTm1zbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD1hYg--';
-$SECRET = 'd09162c0f9d12b3845668301a2776bec8fa5bd23';
+// TODO: this has been defined somewhere else.
+//$API_KEY = 'dj0yJmk9RW1TaFkzN1NNcVFMJmQ9WVdrOVJXRlZjbnBpTm1zbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD1hYg--';
+//$SECRET = 'd09162c0f9d12b3845668301a2776bec8fa5bd23';
 
 class MemeRepository {
     
-    private function _yql_query( $query ) {
+    /* this function should be private but for testing purposes it has been 
+     * changed to public. PLEASE DO NOT CALL IT DIRECTLY! */
+    public function _yql_query( $query ) {
         $yql = new YahooYQLQuery( );
         $result =  $yql->execute( $query );
         if ($result && count( $result->query->results->meme ) == 1 ) {
@@ -93,6 +96,9 @@ class Meme extends MemeRepository {
         return parent::following( $this->name, $start, $limit );   
     }
 
+    /** this function overloards MemeRepository->followers( ). the __call(  ) 
+     * function will decide to call either MemeRepository->followers or 
+     * Meme->followers according to the number of arguments.  */
     private function _followers ( $start = 0, $limit = 10  ) {
         if ( $this->guid ) {
             return parent::_yql_query( "SELECT * FROM meme.followers( $start, $limit ) WHERE owner_guid = '$this->guid'" );
