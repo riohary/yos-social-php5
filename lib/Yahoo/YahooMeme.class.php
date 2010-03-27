@@ -130,6 +130,14 @@ class Meme extends MemeRepository {
         }
     }
 
+    public function getPosts( $offset=0, $limit=10 ) {
+        if ( !$this->guid ) {
+            throw new Exception( 'You are trying get posts from a unknown meme... guid is empty' );
+            return;
+        }
+        return $this->_yql_query( "SELECT * FROM meme.posts( $offset, $limit ) WHERE owner_guid ='$this->guid'" );
+    }
+
     /** this function overloards MemeRepository->following( ). the __call(  ) 
      * function will decide to call either MemeRepository->following or 
      * Meme->following according to the number of arguments.  */
