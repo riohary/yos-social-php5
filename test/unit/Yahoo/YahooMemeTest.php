@@ -2,7 +2,7 @@
 
 
 require_once 'PHPUnit/Framework.php';
-require dirname(__FILE__).'/../../../lib/Yahoo/YahooMEME.class.php';
+require dirname(__FILE__).'/../../../lib/Yahoo/YahooMeme.class.php';
 
 class YahooMemeTest extends PHPUnit_Framework_TestCase {
     public function setup( ) {

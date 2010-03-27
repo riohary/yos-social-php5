@@ -1,6 +1,6 @@
 <?php
 
-require_once( '../../lib/Yahoo/YahooMEME.class.php' );
+require_once( '../../lib/Yahoo/YahooMeme.class.php' );
 
 
 $meme = new Meme( );
