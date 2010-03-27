@@ -16,4 +16,6 @@ print "<h2>[popular posts]</h2> <br />";
 $post = new Post(  );
 foreach( $post->popular( ) as $row) print $row->toString(  ) . "<br />";
 
+print "<h2>[latest 5 posts]</h2> <br />";
+foreach ( $post->search( 'sort:cdate', 0, 5 ) as $row ) print  $row->toString(  ) . "<br />\n";
 ?>

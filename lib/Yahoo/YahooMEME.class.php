@@ -14,27 +14,66 @@ function wtf( $smth ) {
     echo "<pre>"; var_dump( $smth ); echo "</pre>";
 }
 
-// TODO: this has been defined somewhere else.
-//$API_KEY = 'dj0yJmk9RW1TaFkzN1NNcVFMJmQ9WVdrOVJXRlZjbnBpTm1zbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD1hYg--';
-//$SECRET = 'd09162c0f9d12b3845668301a2776bec8fa5bd23';
+class MemeCore {
 
-class MemeRepository {
-    
-    /* this function should be private but for testing purposes it has been 
-     * changed to public. PLEASE DO NOT CALL IT DIRECTLY! */
-    public function _yql_query( $query ) {
+    private $_result = null;
+
+    public function execute( $query ) {
         $yql = new YahooYQLQuery( );
-        $result =  $yql->execute( $query );
-        if ($result && count( $result->query->results->meme ) == 1 ) {
-            return new Meme( $result->query->results->meme );
+        $this->_result =  $yql->execute( $query );
+        if ( !$this->_result ) {
+            throw new Exception( "No records found" ); 
         }
-        else if ( count( $result->query->results->meme ) > 1 ) {
+        if ( $this->_result->query->results->meme ) {
+            return $this->memeResults( );
+        }
+        else if ( $this->_result->query->results->post ) {
+            return $this->postResults( );
+        }
+
+    }
+
+    private function memeResults( ) {
+        $result = $this->_result->query->results; 
+        if (count( $result->meme ) == 1 ) {
+            return new Meme( $result->meme );
+        }
+        else if ( count( $result->meme ) > 1 ) {
             $ret = array( );
-            foreach( $result->query->results->meme as $row ) {
+            foreach( $result->meme as $row ) {
                $ret[] = new Meme( $row ); 
             }
             return $ret;
         }
+    }
+
+    private function postResults( ) {
+        $result = $this->_result->query->results; 
+        if ($result && count( $result->post ) == 1 ) {
+            return new Post( $result->post );
+        }
+        else if ( count( $result->post ) > 1 ) {
+            $ret = array( );
+            foreach( $result->post as $row ) {
+               $ret[] = new Post( $row ); 
+            }
+            return $ret;
+        }
+    }
+}
+
+class MemeRepository {
+    
+    private $core = null;
+
+    public function __construct(  ) {
+        $this->core = new MemeCore( );
+    }
+    
+    /* this function should be private but for testing purposes it has been ;
+     * changed to public. PLEASE DO NOT CALL IT DIRECTLY! */
+    public function _yql_query( $query ) {
+        return $this->core->execute( $query );
     }
 
     public function get( $name ) {
@@ -48,6 +87,10 @@ class MemeRepository {
 
     public function followers ( $name, $offset=0, $limit=10 ) {
         return $this->_yql_query( "SELECT * FROM meme.followers( $offset, $limit ) WHERE owner_guid IN ( SELECT guid FROM meme.info WHERE name = '".$name."' )" );    
+    }
+
+    public function search( $query ) {
+        return $this->_yql_query( "SELECT * FROM meme.people WHERE query = '$query'" );
     }
 }
 
@@ -63,6 +106,7 @@ class Meme extends MemeRepository {
     public  $follower_count;
     
     public function __construct( $data = array() ) {
+        parent::__construct( ); 
         $this->name = $data->name;
         $this->guid = $data->guid;
         $this->title = $data->title;
@@ -124,24 +168,21 @@ class Meme extends MemeRepository {
 }
 
 class PostRepository {
+    
+    public function __construct(  ) {
+        $this->core = new MemeCore( );
+    }
+    
     private function _yql_query( $query ) {
-        $yql = new YahooYQLQuery( );
-        $result =  $yql->execute( $query );
-        //wtf( $result );
-        if ($result && count( $result->query->results->post ) == 1 ) {
-            return new Post( $result->query->results->post );
-        }
-        else if ( count( $result->query->results->post ) > 1 ) {
-            $ret = array( );
-            foreach( $result->query->results->post as $row ) {
-               $ret[] = new Post( $row ); 
-            }
-            return $ret;
-        }
+        return $this->core->execute( $query );
     }
 
     public function popular( $offset=0, $limit=10, $locale='' ) {
         return $this->_yql_query( "SELECT * FROM meme.popular( $offset, $limit ) WHERE locale='$locale'" );
+    }
+
+    public function search( $query, $offset, $limit ) {
+        return $this->_yql_query( "SELECT * FROM meme.search( $offset, $limit ) WHERE query = '$query'" );
     }
 }
 
@@ -160,6 +201,7 @@ class Post extends PostRepository {
     public $via_guid = null;
 
     public function __construct( $data = array(  ) ) {
+        parent::__construct( ); 
         $this->guid = $data->guid;
         $this->pubid = $data->pubid;
         $this->type = $data->type;
