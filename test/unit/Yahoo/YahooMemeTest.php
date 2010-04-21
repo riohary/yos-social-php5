@@ -88,7 +88,7 @@ class YahooMemeTest extends PHPUnit_Framework_TestCase {
 
     public function testMemeRepositorySearch(  ) {
         // TODO: create a test that is different from the others... is this 
-        // needed, as we are only fwding the results from _yql_query() 
+        // needed, as we are just fwding the results from _yql_query() 
         // anyway...
     }
 }

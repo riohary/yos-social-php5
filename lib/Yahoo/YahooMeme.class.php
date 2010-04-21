@@ -69,8 +69,25 @@ class MemeRepository {
     public function __construct(  ) {
         $this->core = new MemeCore( );
     }
+
+    public function __call( $method, $args ) {
+        if ( $method == "getPosts" ) {
+            if ( count( $args ) == 3 ) {
+                return $this->_getPosts( $args[0], $args[1], $args[2] );
+            }
+        if ( $method == "following" ) {
+            if ( count( $args ) == 3 ) {
+                return $this->_following( $args[0], $args[1], $args[2] );
+            }
+        }
+        if ( $method == "followers" ) {
+            if ( count( $args ) == 3 ) {
+                return $this->_followers( $args[0],$args[1], $args[2] );
+            }
+        }
+    }
     
-    /* this function should be private but for testing purposes it has been ;
+    /* this function should be private but for testing purposes its visibility has been 
      * changed to public. PLEASE DO NOT CALL IT DIRECTLY! */
     public function _yql_query( $query ) {
         return $this->core->execute( $query );
@@ -80,17 +97,22 @@ class MemeRepository {
         return $this->_yql_query( "SELECT * FROM meme.info WHERE name ='".$name."'" );
     }
 
-    public function following( $name, $offset=0, $limit=10 ) {
-        $guid = $this->get( $name )->guid;
+    public function _following( $name, $offset=0, $limit=10, $_use_guid=false ) {
+        $guid = $_use_guid ? $name : $this->get( $name )->guid;
         return $this->_yql_query( "SELECT * FROM meme.following( $offset, $limit ) WHERE owner_guid = '$guid'" );
     }
 
-    public function followers ( $name, $offset=0, $limit=10 ) {
-        return $this->_yql_query( "SELECT * FROM meme.followers( $offset, $limit ) WHERE owner_guid IN ( SELECT guid FROM meme.info WHERE name = '".$name."' )" );    
+    public function _followers ( $name, $offset=0, $limit=10, $_use_guid=false ) {
+        $guid = $_use_guid ? $name : $this->get( $name )->guid;
+        return $this->_yql_query( "SELECT * FROM meme.followers( $offset, $limit ) WHERE owner_guid = '$guid'" );    
     }
 
     public function search( $query ) {
         return $this->_yql_query( "SELECT * FROM meme.people WHERE query = '$query'" );
+    }
+
+    public function _getPosts( $guid, $offset, $limit  ) {
+        return $this->_yql_query( "SELECT * FROM meme.posts( $offset, $limit ) WHERE owner_guid ='$guid'" );
     }
 }
 
@@ -121,21 +143,30 @@ class Meme extends MemeRepository {
     public function __call( $method, $args ) {
         if ( $method == 'following' ) {
             if ( count( $args ) == 3 ) {
-                return parent::following( $args[0], $args[1], $args[2] );
+                return parent::_following( $args[0], $args[1], $args[2] );
             } else if ( count( $args ) == 2 ) {
                 return $this->_following( $args[0], $args[1] );
             } else {
                 return $this->_following(  );
             }
         }
+        if ( $method == 'getPosts' ) {
+            if ( count( $args ) == 3 ) {
+                return parent::_getPosts( $args[0], $args[1], $args[2] );
+            } else if ( count( $args ) == 2 ) {
+                return $this->_getPosts( $args[0], $args[1] );
+            } else {
+                return $this->_getPosts(  );
+            }
+        }
     }
 
-    public function getPosts( $offset=0, $limit=10 ) {
+    public function _getPosts( $offset=0, $limit=10 ) {
         if ( !$this->guid ) {
             throw new Exception( 'You are trying get posts from a unknown meme... guid is empty' );
             return;
         }
-        return $this->_yql_query( "SELECT * FROM meme.posts( $offset, $limit ) WHERE owner_guid ='$this->guid'" );
+        return parent::_getPosts( $this->guid, $offset, $limit );
     }
 
     /** this function overloards MemeRepository->following( ). the __call(  ) 
@@ -143,7 +174,7 @@ class Meme extends MemeRepository {
      * Meme->following according to the number of arguments.  */
     private function _following( $start = 0,  $limit = 10 ) {
         if ( $this->guid ) {
-            return parent::_yql_query( "SELECT * FROM meme.following( $start, $limit ) WHERE owner_guid = '$this->guid'" );
+            return parent::following( $this->guid, $start, $limit, true );
         }
         return parent::following( $this->name, $start, $limit );   
     }
@@ -153,7 +184,7 @@ class Meme extends MemeRepository {
      * Meme->followers according to the number of arguments.  */
     private function _followers ( $start = 0, $limit = 10  ) {
         if ( $this->guid ) {
-            return parent::_yql_query( "SELECT * FROM meme.followers( $start, $limit ) WHERE owner_guid = '$this->guid'" );
+            return parent::followers( $this->guid, $start, $limit, true );
         }
         return parent::followers( $this->name, $start, $limit );   
     }
