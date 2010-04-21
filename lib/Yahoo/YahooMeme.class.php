@@ -73,17 +73,23 @@ class MemeRepository {
         if ( $method == "getPosts" ) {
             if ( count( $args ) == 3 ) {
                 return $this->_getPosts( $args[0], $args[1], $args[2] );
-            }
-        };
+            } else if ( count( $args ) == 2 ) {
+                return $this->_getPosts( $args[0], $args[1] );
+            } else return $this->_getPosts( $args[0] );
+        }
         if ( $method == "following" ) {
             if ( count( $args ) == 3 ) {
                 return $this->_following( $args[0], $args[1], $args[2] );
-            }
+            } else if ( count( $args ) == 2 ) {
+                return $this->_following( $args[0], $args[1] );
+            } else return $this->_following( $args[0] );
         }
         if ( $method == "followers" ) {
             if ( count( $args ) == 3 ) {
                 return $this->_followers( $args[0],$args[1], $args[2] );
-            }
+            } else if ( count( $args ) == 2 ) {
+                return $this->_followers( $args[0], $args[1] );
+            } else return $this->_followers( $args[0] );
         }
     }
     
