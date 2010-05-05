@@ -2,15 +2,14 @@
 
 require_once( '../../lib/Yahoo/YahooMeme.class.php' );
 
-
 $meme = new Meme( );
-//
-//print "<h2>[info about bigo]</h2> <br />";
-//print $meme->get( "bigodines" )->toString( );
-//
-//print "<h2>[bigo followers]</h2> <br/>";
-//foreach( $meme->following( "bigodines" ) as $row) print $row->toString(  ) . "<br />";
-//
+
+print "<h2>[info about bigo]</h2> <br />";
+print $meme->get( "bigodines" )->toString( true );
+
+print "<h2>[people following bigodines]</h2> <br/>";
+$repo = new MemeRepository(  );
+foreach( $repo->following( "bigodines" ) as $row) print $row->toString(  ) . "<br />";
 
 print "<h2>[bigo latest 5 posts]</h2>";
 
