@@ -25,15 +25,14 @@ class MemeCore {
             throw new Exception( "No records found" ); 
         }
         if ( $this->_result->query->results->meme ) {
-            return $this->memeResults( );
+            return $this->_memeResults( );
         }
         else if ( $this->_result->query->results->post ) {
-            return $this->postResults( );
+            return $this->_postResults( );
         }
-
     }
 
-    private function memeResults( ) {
+    private function _memeResults( ) {
         $result = $this->_result->query->results; 
         if (count( $result->meme ) == 1 ) {
             return new Meme( $result->meme );
@@ -47,7 +46,7 @@ class MemeCore {
         }
     }
 
-    private function postResults( ) {
+    private function _postResults( ) {
         $result = $this->_result->query->results; 
         if ($result && count( $result->post ) == 1 ) {
             return new Post( $result->post );
@@ -74,16 +73,23 @@ class MemeRepository {
         if ( $method == "getPosts" ) {
             if ( count( $args ) == 3 ) {
                 return $this->_getPosts( $args[0], $args[1], $args[2] );
-            }
+            } else if ( count( $args ) == 2 ) {
+                return $this->_getPosts( $args[0], $args[1] );
+            } else return $this->_getPosts( $args[0] );
+        }
         if ( $method == "following" ) {
             if ( count( $args ) == 3 ) {
                 return $this->_following( $args[0], $args[1], $args[2] );
-            }
+            } else if ( count( $args ) == 2 ) {
+                return $this->_following( $args[0], $args[1] );
+            } else return $this->_following( $args[0] );
         }
         if ( $method == "followers" ) {
             if ( count( $args ) == 3 ) {
                 return $this->_followers( $args[0],$args[1], $args[2] );
-            }
+            } else if ( count( $args ) == 2 ) {
+                return $this->_followers( $args[0], $args[1] );
+            } else return $this->_followers( $args[0] );
         }
     }
     
@@ -97,12 +103,12 @@ class MemeRepository {
         return $this->_yql_query( "SELECT * FROM meme.info WHERE name ='".$name."'" );
     }
 
-    public function _following( $name, $offset=0, $limit=10, $_use_guid=false ) {
+    protected function _following( $name, $offset=0, $limit=10, $_use_guid=false ) {
         $guid = $_use_guid ? $name : $this->get( $name )->guid;
         return $this->_yql_query( "SELECT * FROM meme.following( $offset, $limit ) WHERE owner_guid = '$guid'" );
     }
 
-    public function _followers ( $name, $offset=0, $limit=10, $_use_guid=false ) {
+    protected function _followers ( $name, $offset=0, $limit=10, $_use_guid=false ) {
         $guid = $_use_guid ? $name : $this->get( $name )->guid;
         return $this->_yql_query( "SELECT * FROM meme.followers( $offset, $limit ) WHERE owner_guid = '$guid'" );    
     }
@@ -111,7 +117,7 @@ class MemeRepository {
         return $this->_yql_query( "SELECT * FROM meme.people WHERE query = '$query'" );
     }
 
-    public function _getPosts( $guid, $offset, $limit  ) {
+    protected function _getPosts( $guid, $offset, $limit  ) {
         return $this->_yql_query( "SELECT * FROM meme.posts( $offset, $limit ) WHERE owner_guid ='$guid'" );
     }
 }
@@ -161,7 +167,7 @@ class Meme extends MemeRepository {
         }
     }
 
-    public function _getPosts( $offset=0, $limit=10 ) {
+    protected function _getPosts( $offset=0, $limit=10 ) {
         if ( !$this->guid ) {
             throw new Exception( 'You are trying get posts from a unknown meme... guid is empty' );
             return;
@@ -169,24 +175,18 @@ class Meme extends MemeRepository {
         return parent::_getPosts( $this->guid, $offset, $limit );
     }
 
-    /** this function overloards MemeRepository->following( ). the __call(  ) 
-     * function will decide to call either MemeRepository->following or 
-     * Meme->following according to the number of arguments.  */
-    private function _following( $start = 0,  $limit = 10 ) {
+    protected function _following( $start = 0,  $limit = 10 ) {
         if ( $this->guid ) {
-            return parent::following( $this->guid, $start, $limit, true );
+            return parent::_following( $this->guid, $start, $limit, true );
         }
-        return parent::following( $this->name, $start, $limit );   
+        return parent::_following( $this->name, $start, $limit );   
     }
 
-    /** this function overloards MemeRepository->followers( ). the __call(  ) 
-     * function will decide to call either MemeRepository->followers or 
-     * Meme->followers according to the number of arguments.  */
-    private function _followers ( $start = 0, $limit = 10  ) {
+    protected function _followers ( $start = 0, $limit = 10  ) {
         if ( $this->guid ) {
-            return parent::followers( $this->guid, $start, $limit, true );
+            return parent::_followers( $this->guid, $start, $limit, true );
         }
-        return parent::followers( $this->name, $start, $limit );   
+        return parent::_followers( $this->name, $start, $limit );   
     }
     
     public function toString( $fullInfo = false  ) {
