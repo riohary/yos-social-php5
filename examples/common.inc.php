@@ -105,6 +105,5 @@ require_once "Auth/OpenID/PAPE.php";
  * Require Yahoo! PHP5 SDK libraries
  */
 require_once 'Yahoo/YahooOAuthApplication.class.php';
-
 header('Cache-Control: no-cache, must-revalidate');
 header('Pragma: no-cache');

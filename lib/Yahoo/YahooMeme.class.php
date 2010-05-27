@@ -18,9 +18,8 @@ class MemeCore {
 
     private $_result = null;
 
-    public function execute( $query ) {
+    public function execute( $query) {
         $yql = new YahooYQLQuery( );
-        $this->_result =  $yql->execute( $query );
         if ( !$this->_result ) {
             throw new Exception( "No records found" ); 
         }
@@ -29,6 +28,8 @@ class MemeCore {
         }
         else if ( $this->_result->query->results->post ) {
             return $this->_postResults( );
+        } else {
+            return $this->_result;
         }
     }
 
@@ -91,6 +92,15 @@ class MemeRepository {
                 return $this->_followers( $args[0], $args[1] );
             } else return $this->_followers( $args[0] );
         }
+    }
+
+    public function insert($consumer, $token,  $type, $content ) {
+        $client = new OAuthClient( $consumer, $token );
+        $webServiceUrl = "http://query.yahooapis.com/v1/yql";
+        $params = array("q" => "INSERT INTO meme.user.posts ( type, content ) VALUES ( '$type' ,'".$content ."')",
+                       "format" => "json",
+                       "callback" => "void" );
+        return $client->get( $webServiceUrl, $params ));
     }
     
     /* this function should be private but for testing purposes its visibility has been 

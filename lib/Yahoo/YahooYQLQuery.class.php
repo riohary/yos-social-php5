@@ -46,12 +46,12 @@ class YahooYQLQuery
   const OAUTH_API_URL   = 'http://query.yahooapis.com/v1/yql';
   const DATATABLES_URL  = 'http://datatables.org/alltables.env';
 
-  public function execute($yql, $parameters = array(), $method = YahooCurl::GET)
+  public function execute($yql, $parameters = array(), $method = YahooCurl::GET, $endpoint = "default")
   {
-    $url = self::PUBLIC_API_URL;
+    $url = ( $endpoint == "oauth" ) ? self::OAUTH_API_URL : self::PUBLIC_API_URL;
     $parameters = array_merge(array('q' => $yql, 'format' => 'json', 'env' => self::DATATABLES_URL), $parameters);
     $http = YahooCurl::fetch($url, $parameters, array(), $method);
-
+    print_r( $http );
     return ($http) ? json_decode($http['response_body']) : false;
   }
 
