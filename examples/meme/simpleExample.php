@@ -15,7 +15,7 @@ foreach( $repo->following( "bigodines" ) as $row) print $row->toString(  ) . "<b
 >>>>>>> master
 
 print "<h2>[info about bigo]</h2> <br />";
-print $meme->get( "bigodines" )->toString( );
+print $meme->get( "bigodines" )->toString( true );
 
 print "<h2>[people following bigodines]</h2> <br/>";
 $repo = new MemeRepository(  );
