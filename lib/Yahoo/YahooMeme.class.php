@@ -94,13 +94,11 @@ class MemeRepository {
         }
     }
 
-    public function insert($consumer, $token,  $type, $content ) {
-        $client = new OAuthClient( $consumer, $token );
-        $webServiceUrl = "http://query.yahooapis.com/v1/yql";
-        $params = array("q" => "INSERT INTO meme.user.posts ( type, content ) VALUES ( '$type' ,'".$content ."')",
-                       "format" => "json",
-                       "callback" => "void" );
-        return $client->get( $webServiceUrl, $params ));
+    public function insert($app, $type, $content ) {;
+
+      return $app->yql( "INSERT INTO meme.user.posts ( type, content ) VALUES ( '$type' ,'".$content ."')", array(
+														  "format" => "json", "callback" => "void") );
+
     }
     
     /* this function should be private but for testing purposes its visibility has been 

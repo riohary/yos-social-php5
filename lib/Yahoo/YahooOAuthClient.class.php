@@ -64,7 +64,6 @@ class YahooOAuthClient
   public function fetch_access_token($oauth_request)
   {
     $http = YahooCurl::fetch($oauth_request->to_url(), array(), array(), $oauth_request->get_normalized_http_method());
-
     return YahooOAuthAccessToken::from_string($http['response_body']);
   }
 

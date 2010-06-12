@@ -43,7 +43,7 @@
 # openid/oauth credentials
 define('OAUTH_CONSUMER_KEY', 'dj0yJmk9eVFId1B4N3BNZGEzJmQ9WVdrOWJWRnBhSFpZTlRnbWNHbzlNemM1T1RRM01EazQmcz1jb25zdW1lcnNlY3JldCZ4PWE3'); // bigo test key; please replace with your own.
 define('OAUTH_CONSUMER_SECRET', 'ee84086f94c111c1ea40dee7d040e69ff521b2e4');
-define('OAUTH_DOMAIN', 'bigodines.com');
+define('OAUTH_DOMAIN', 'localhost');
 define('OAUTH_APP_ID', 'mQihvX58');
 
 # date time
@@ -71,7 +71,6 @@ set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).'/../lib/Op
  */
 require_once 'OAuth/OAuth.php';
 
-
 /**
  * OpenID - http://www.openidenabled.com/php-openid/
  */
@@ -79,22 +78,22 @@ require_once 'OAuth/OAuth.php';
 /**
  * Require OpenID consumer.
  */
-require_once "Auth/OpenID/Consumer.php";
+#require_once "Auth/OpenID/Consumer.php";
 
 /**
  * Require OpenID filestore.
  */
-require_once "Auth/OpenID/FileStore.php";
+#require_once "Auth/OpenID/FileStore.php";
 
 /**
  * Require SReg Extension.
  */
-require_once "Auth/OpenID/SReg.php";
+#require_once "Auth/OpenID/SReg.php";
 
 /**
  * Require PAPE extension.
  */
-require_once "Auth/OpenID/PAPE.php";
+#require_once "Auth/OpenID/PAPE.php";
 
 
 /**
