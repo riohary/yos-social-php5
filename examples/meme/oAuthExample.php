@@ -25,7 +25,6 @@ if ( !$action || $action == 'request_token' ) {
 
 } else if ( $action == "authorized" ) {
 
-  print "------------------------------<br />";
   $request_token = new OAuthConsumer($_SESSION['request_token_key'], $_SESSION['request_token_secret']);
   $response = $app->getAccessToken($request_token, $_GET['oauth_verifier'] );
   parse_str( $response, $params);
