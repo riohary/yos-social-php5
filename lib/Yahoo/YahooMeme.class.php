@@ -70,6 +70,7 @@ class MemeRepository {
         $this->core = new MemeCore( );
     }
 
+    // weirdest method overloading ever?!
     public function __call( $method, $args ) {
         if ( $method == "getPosts" ) {
             if ( count( $args ) == 3 ) {
@@ -94,9 +95,11 @@ class MemeRepository {
         }
     }
 
-    public function insert($app, $type, $content ) {;
-
-      return $app->yql( "INSERT INTO meme.user.posts ( type, content ) VALUES ( '$type' ,'".$content ."')", array(
+    public function insert($app, $type, $content, $caption=null ) {;
+      if (in_array($type, array('photo', 'video')))
+	  return $app->yql("INSERT INTO meme.user.posts (type, content, caption) VALUES ('$type', '$content', '$caption')",array("format" => "json", "callback" => "void"));
+      else
+          return $app->yql( "INSERT INTO meme.user.posts ( type, content ) VALUES ( '$type' ,'".$content ."')", array(
 														  "format" => "json", "callback" => "void") );
 
     }
